@@ -11,7 +11,8 @@ export default {
       borderGray: '#E3E3E3',
     },
     fontFamily: {
-      SUIT: ['Regular', 'Medium'],
+      MaplestoryBold: ['Maplestory-Bold'],
+      MaplestoryLight: ['Maplestory-Light'],
     },
     extend: {},
   },

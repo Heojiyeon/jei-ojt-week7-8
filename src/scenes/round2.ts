@@ -11,7 +11,7 @@ class Round2Scene extends Scene {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
   constructor() {
-    super('round1-scene');
+    super('round2-scene');
   }
 
   preload() {
@@ -79,6 +79,8 @@ class Round2Scene extends Scene {
       'crocodileLeft'
     );
 
+    this.crocodile.body.setGravityY(300);
+    this.poi.setCollideWorldBounds(true);
     this.physics.add.collider(this.platforms, this.crocodile);
 
     this.cursors = this.input.keyboard?.createCursorKeys();

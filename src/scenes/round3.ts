@@ -12,7 +12,7 @@ class Round3Scene extends Scene {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
   constructor() {
-    super('round1-scene');
+    super('round3-scene');
   }
 
   preload() {

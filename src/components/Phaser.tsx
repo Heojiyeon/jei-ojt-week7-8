@@ -3,6 +3,9 @@ import { useEffect, useRef } from 'react';
 
 import HomeScene from '@/scenes/home';
 import NoticeScene from '@/scenes/notice';
+import Round1Scene from '@/scenes/round1';
+import Round2Scene from '@/scenes/round2';
+import Round3Scene from '@/scenes/round3';
 
 /**
  * @returns 페이저 캔버스 컴포넌트
@@ -22,11 +25,10 @@ const Phaser = () => {
       physics: {
         default: 'arcade',
         arcade: {
-          gravity: { y: 300 },
           debug: false,
         },
       },
-      scene: [HomeScene, NoticeScene],
+      scene: [HomeScene, NoticeScene, Round1Scene, Round2Scene, Round3Scene],
     };
 
     PhaserGameRef.current = new Game(config);

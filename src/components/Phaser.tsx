@@ -1,6 +1,9 @@
 import { AUTO, Game, WEBGL } from 'phaser';
 import { useEffect, useRef } from 'react';
 
+import HomeScene from '@/scenes/home';
+import NoticeScene from '@/scenes/notice';
+
 /**
  * @returns 페이저 캔버스 컴포넌트
  */
@@ -12,8 +15,8 @@ const Phaser = () => {
 
     const config = {
       type: WEBGL,
-      width: 1200,
-      height: 700,
+      width: 800,
+      height: 500,
       AUTO,
       gameArea,
       physics: {
@@ -23,7 +26,7 @@ const Phaser = () => {
           debug: false,
         },
       },
-      scene: [],
+      scene: [HomeScene, NoticeScene],
     };
 
     PhaserGameRef.current = new Game(config);

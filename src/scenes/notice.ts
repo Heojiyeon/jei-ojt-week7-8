@@ -29,6 +29,10 @@ class NoticeScene extends Scene {
       gameHeight - gameHeight / 2,
       'noticeBoard'
     );
+
+    this.time.delayedCall(500, () => {
+      this.scene.launch('round1-scene');
+    });
   }
 }
 

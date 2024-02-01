@@ -50,9 +50,9 @@ class HomeScene extends Scene {
         )
         .setScale(0.4, 0.4);
 
-      this.cameras.main.fadeOut(500, 202, 255, 251);
+      this.cameras.main.fadeOut(1000, 202, 255, 251);
 
-      this.time.delayedCall(1000, () => {
+      this.time.delayedCall(500, () => {
         this.scene.launch('notice-scene');
       });
     };

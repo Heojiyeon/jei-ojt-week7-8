@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import { GameObjects, Scene } from 'phaser';
 
 import { gameRound1Problems } from '@/constants/game';
 
@@ -42,6 +42,10 @@ class Round1Scene extends Scene {
 
   // 정답과 해당 알파벳의 획득 여부
   private answer: AnswerAlphabet[];
+
+  // hp 잔여량
+  private hpContent: number;
+  private hpText: GameObjects.Text | undefined;
 
   constructor() {
     super('round1-scene');
@@ -97,6 +101,8 @@ class Round1Scene extends Scene {
           locX: 640 + idx * 30,
         };
       });
+
+    this.hpContent = 100;
   }
 
   setState(index: number) {
@@ -128,6 +134,14 @@ class Round1Scene extends Scene {
       });
   }
 
+  setHpContent(isIncrease: boolean) {
+    if (isIncrease) {
+      this.hpContent < 100 ? (this.hpContent += 10) : 100;
+    } else {
+      this.hpContent > 10 ? (this.hpContent -= 20) : 0;
+    }
+  }
+
   preload() {
     this.load.image('homeBackground', 'assets/backgrounds/bg_step_1.webp');
     this.load.image('floor', 'assets/backgrounds/floor.webp');
@@ -146,6 +160,8 @@ class Round1Scene extends Scene {
       frameWidth: 168,
       frameHeight: 181,
     });
+
+    this.load.image('seed', 'assets/items/item_seed_0.webp');
   }
 
   create() {
@@ -163,11 +179,6 @@ class Round1Scene extends Scene {
     this.add
       .image(gameWidth - gameWidth / 8, gameHeight / 6, 'displayBoard')
       .setScale(undefined, 1.1);
-
-    this.add.image(gameWidth / 7, gameHeight / 12, 'hpBackground');
-    this.add
-      .image(gameWidth / 7, gameHeight / 12, 'hpContent')
-      .setSize(120, 20);
 
     this.platforms = this.physics.add.staticGroup();
 
@@ -209,13 +220,18 @@ class Round1Scene extends Scene {
 
     this.createRandomAlphabet();
     this.createAnswerAlphabet();
+
+    this.hpText = this.add.text(16, 16, 'HP: 100', {
+      fontSize: '32px',
+      color: '#000',
+    });
   }
 
   /**
    * 랜덤 알파벳 생성 함수
    */
   createRandomAlphabet() {
-    const randomIdx = () => Math.floor(Math.random() * 25);
+    const randomIdx = () => Math.floor(Math.random() * 26);
     const randomGravity = () => Math.ceil(Math.random() * 2) * 100;
 
     this.state.forEach((item, idx) => {
@@ -223,7 +239,7 @@ class Round1Scene extends Scene {
         item.currentItem = this.physics.add.image(
           item.locX,
           0,
-          `alphabet-${alphabets[randomIdx()]}`
+          randomIdx() < 25 ? `alphabet-${alphabets[randomIdx()]}` : 'seed'
         );
 
         item.currentItem.setGravityY(randomGravity());
@@ -247,7 +263,7 @@ class Round1Scene extends Scene {
       this.answerItems
         ?.create(item.locX, 80, `alphabet-${item.alphabet}`)
         .setAlpha(0.4)
-        .setScale(0.7);
+        .setScale(0.5);
     });
   }
 
@@ -319,8 +335,19 @@ class Round1Scene extends Scene {
           const ANSWER = gameRound1Problems[this.currentProblemOrder];
           const itemContent = currState.currentItem?.texture.key.slice(-1);
 
+          // 씨앗인 경우
+          if (currState.currentItem?.texture.key === 'seed') {
+            this.setHpContent(false);
+            this.hpText?.setText(`HP: ${this.hpContent}`);
+
+            // 게임 종료
+            if (this.hpContent <= 0) {
+              alert('game over!');
+            }
+          }
+
           // 아이템이 정답인 경우
-          if (itemContent && ANSWER.indexOf(itemContent) !== -1) {
+          else if (itemContent && ANSWER.indexOf(itemContent) !== -1) {
             const targetItems = this.answer.filter(
               item => item.alphabet === itemContent
             );
@@ -331,6 +358,7 @@ class Round1Scene extends Scene {
               }
             });
           }
+
           this.setState(index); // true
           this.createRandomAlphabet();
         });

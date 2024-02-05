@@ -4,13 +4,13 @@ import { gameRound1Problems } from '@/constants/game';
 
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
-interface Item {
+export interface Item {
   currentItem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
   isRemoved: boolean;
   locX: number;
 }
 
-interface AnswerAlphabet {
+export interface AnswerAlphabet {
   alphabet: string;
   isCollected: boolean;
   locX: number;
@@ -302,8 +302,13 @@ class Round1Scene extends Scene {
       if (remainingCorrectItem.length === 0) {
         this.setCurrentProblemOrder();
 
-        this.setAnswer();
-        this.createAnswerAlphabet();
+        if (this.currentProblemOrder >= gameRound1Problems.length) {
+          this.scene.launch('round2-scene');
+          return;
+        } else {
+          this.setAnswer();
+          this.createAnswerAlphabet();
+        }
       }
     }
   }
@@ -311,11 +316,11 @@ class Round1Scene extends Scene {
   update(): void {
     if (this.cursors && this.poi) {
       if (this.cursors.left.isDown) {
-        this.poi.setVelocityX(-160);
+        this.poi.setVelocityX(-300);
 
         this.poi.anims.play('left', true);
       } else if (this.cursors.right.isDown) {
-        this.poi.setVelocityX(160);
+        this.poi.setVelocityX(300);
 
         this.poi.anims.play('right', true);
       } else {
@@ -325,7 +330,7 @@ class Round1Scene extends Scene {
       }
 
       if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-400);
+        this.poi.setVelocityY(-200);
       }
     }
 
@@ -352,7 +357,7 @@ class Round1Scene extends Scene {
           }
 
           // 바나나인 경우
-          if (currState.currentItem?.texture.key === 'banana') {
+          else if (currState.currentItem?.texture.key === 'banana') {
             this.setHpContent(true);
             this.hpText?.setText(`HP: ${this.hpContent}`);
           }
@@ -368,6 +373,9 @@ class Round1Scene extends Scene {
                 this.updateAnswerAlphabet(targetItem.alphabet);
               }
             });
+          } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
+            this.setHpContent(false);
+            this.hpText?.setText(`HP: ${this.hpContent}`);
           }
 
           this.setState(index); // true

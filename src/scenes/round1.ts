@@ -161,7 +161,8 @@ class Round1Scene extends Scene {
       frameHeight: 181,
     });
 
-    this.load.image('seed', 'assets/items/item_seed_0.webp');
+    this.load.image('seed', 'assets/items/item_seed.webp');
+    this.load.image('banana', 'assets/items/item_banana.webp');
   }
 
   create() {
@@ -239,7 +240,11 @@ class Round1Scene extends Scene {
         item.currentItem = this.physics.add.image(
           item.locX,
           0,
-          randomIdx() < 25 ? `alphabet-${alphabets[randomIdx()]}` : 'seed'
+          randomIdx() < 25
+            ? `alphabet-${alphabets[randomIdx()]}`
+            : randomIdx() === 25
+              ? 'seed'
+              : 'banana'
         );
 
         item.currentItem.setGravityY(randomGravity());
@@ -344,6 +349,12 @@ class Round1Scene extends Scene {
             if (this.hpContent <= 0) {
               alert('game over!');
             }
+          }
+
+          // 바나나인 경우
+          if (currState.currentItem?.texture.key === 'banana') {
+            this.setHpContent(true);
+            this.hpText?.setText(`HP: ${this.hpContent}`);
           }
 
           // 아이템이 정답인 경우

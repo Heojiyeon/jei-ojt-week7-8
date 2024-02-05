@@ -10,6 +10,12 @@ interface Item {
   locX: number;
 }
 
+interface AnswerAlphabet {
+  alphabet: string;
+  isCollected: boolean;
+  locX: number;
+}
+
 class Round1Scene extends Scene {
   private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
   private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
@@ -24,6 +30,8 @@ class Round1Scene extends Scene {
   private item6: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
   private item7: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
 
+  private answerItems: Phaser.Physics.Arcade.StaticGroup | undefined;
+
   private state: Item[];
 
   // 문제 번호
@@ -31,6 +39,9 @@ class Round1Scene extends Scene {
 
   // 알파벳을 획득한 경우의 상태
   private correctAlphabets: string[];
+
+  // 정답과 해당 알파벳의 획득 여부
+  private answer: AnswerAlphabet[];
 
   constructor() {
     super('round1-scene');
@@ -75,6 +86,17 @@ class Round1Scene extends Scene {
 
     this.currentProblemOrder = 0;
     this.correctAlphabets = [];
+
+    // 정답 상태
+    this.answer = gameRound1Problems[this.currentProblemOrder]
+      .split('')
+      .map((currentAlphabet, idx) => {
+        return {
+          alphabet: currentAlphabet,
+          isCollected: false,
+          locX: 640 + idx * 30,
+        };
+      });
   }
 
   setState(index: number) {
@@ -90,6 +112,20 @@ class Round1Scene extends Scene {
 
   setCorrectAlphabets(correctAlphabet: string) {
     this.correctAlphabets.push(correctAlphabet);
+  }
+
+  setAnswer() {
+    this.answer = [];
+
+    this.answer = gameRound1Problems[this.currentProblemOrder]
+      .split('')
+      .map((currentAlphabet, idx) => {
+        return {
+          alphabet: currentAlphabet,
+          isCollected: false,
+          locX: 640 + idx * 30,
+        };
+      });
   }
 
   preload() {
@@ -171,12 +207,13 @@ class Round1Scene extends Scene {
       repeat: -1,
     });
 
-    /**
-     * 랜덤 알파벳 생성
-     */
     this.createRandomAlphabet();
+    this.createAnswerAlphabet();
   }
 
+  /**
+   * 랜덤 알파벳 생성 함수
+   */
   createRandomAlphabet() {
     const randomIdx = () => Math.floor(Math.random() * 25);
     const randomGravity = () => Math.ceil(Math.random() * 2) * 100;
@@ -196,7 +233,61 @@ class Round1Scene extends Scene {
     });
   }
 
-  update(time: number, delta: number): void {
+  /**
+   * 답안 알파벳 생성 함수
+   */
+  createAnswerAlphabet() {
+    if (this.answerItems) {
+      this.answerItems.destroy(true, true);
+    }
+
+    this.answerItems = this.physics.add.staticGroup();
+
+    this.answer.forEach(item => {
+      this.answerItems
+        ?.create(item.locX, 80, `alphabet-${item.alphabet}`)
+        .setAlpha(0.4)
+        .setScale(0.7);
+    });
+  }
+
+  /**
+   * 획득한 정답 알파벳 생성 함수
+   */
+  updateAnswerAlphabet(currentAlphabet: string) {
+    this.answer = this.answer.map(item => {
+      return item.alphabet === currentAlphabet
+        ? {
+            ...item,
+            isCollected: true,
+          }
+        : item;
+    });
+
+    const targetItem = this.answer.filter(item => item.isCollected === true);
+
+    if (targetItem.length > 0) {
+      targetItem.map(item => {
+        this.answerItems
+          ?.create(item.locX, 80, `alphabet-${item.alphabet}`)
+          .setAlpha(1)
+          .setScale(0.7);
+      });
+
+      const remainingCorrectItem = this.answer.filter(
+        item => item.isCollected === false
+      );
+
+      if (remainingCorrectItem.length === 0) {
+        this.setCurrentProblemOrder();
+
+        this.setAnswer();
+        this.createAnswerAlphabet();
+      }
+    }
+  }
+
+  update(): void {
     if (this.cursors && this.poi) {
       if (this.cursors.left.isDown) {
         this.poi.setVelocityX(-160);
@@ -230,11 +321,17 @@ class Round1Scene extends Scene {
 
           // 아이템이 정답인 경우
           if (itemContent && ANSWER.indexOf(itemContent) !== -1) {
-            console.log('corrent alphabet!');
+            const targetItems = this.answer.filter(
+              item => item.alphabet === itemContent
+            );
+
+            targetItems.map(targetItem => {
+              if (targetItem.isCollected === false) {
+                this.updateAnswerAlphabet(targetItem.alphabet);
+              }
+            });
           }
-
           this.setState(index); // true
-
           this.createRandomAlphabet();
         });
 

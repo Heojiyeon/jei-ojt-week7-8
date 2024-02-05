@@ -120,10 +120,22 @@ class Round3Scene extends Scene {
       frameHeight: 181,
     });
 
+    this.load.spritesheet(
+      'crocodile',
+      'assets/characters/croc_spritesheet.webp',
+      {
+        frameWidth: 100,
+        frameHeight: 80,
+      }
+    );
+
     this.load.spritesheet('bat', 'assets/characters/bat_spritesheet.webp', {
       frameWidth: 200,
       frameHeight: 73,
     });
+
+    this.load.image('seed', 'assets/items/item_seed.webp');
+    this.load.image('banana', 'assets/items/item_banana.webp');
   }
 
   setState(index: number) {
@@ -284,10 +296,11 @@ class Round3Scene extends Scene {
 
     this.physics.add.collider(this.poi, this.platforms);
 
-    this.crocodile = this.physics.add.image(
+    this.crocodile = this.physics.add.sprite(
       gameWidth - gameWidth / 8,
       gameHeight - 150,
-      'crocodileLeft'
+      'crocodile',
+      0
     );
 
     this.crocodile.body.setGravityY(300);

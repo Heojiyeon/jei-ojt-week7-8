@@ -102,8 +102,6 @@ class Round2Scene extends Scene {
     this.load.image('round2Background', 'assets/backgrounds/bg_step_2.webp');
     this.load.image('floor', 'assets/backgrounds/floor.webp');
     this.load.image('displayBoard', 'assets/boards/board_display.webp');
-    this.load.image('crocodileLeft', 'assets/characters/croc_left.webp');
-    this.load.image('crocodileRight', 'assets/characters/croc_right.webp');
 
     alphabets.split('').map(alphabet => {
       this.load.image(
@@ -116,6 +114,18 @@ class Round2Scene extends Scene {
       frameWidth: 168,
       frameHeight: 181,
     });
+
+    this.load.spritesheet(
+      'crocodile',
+      'assets/characters/croc_spritesheet.webp',
+      {
+        frameWidth: 100,
+        frameHeight: 80,
+      }
+    );
+
+    this.load.image('seed', 'assets/items/item_seed.webp');
+    this.load.image('banana', 'assets/items/item_banana.webp');
   }
 
   setState(index: number) {
@@ -273,10 +283,11 @@ class Round2Scene extends Scene {
 
     this.physics.add.collider(this.poi, this.platforms);
 
-    this.crocodile = this.physics.add.image(
+    this.crocodile = this.physics.add.sprite(
       gameWidth - gameWidth / 8,
       gameHeight - 150,
-      'crocodileLeft'
+      'crocodile',
+      0
     );
 
     this.crocodile.body.setGravityY(300);
@@ -394,6 +405,18 @@ class Round2Scene extends Scene {
         });
       }
     });
+
+    /**
+     * 악어와 overlap 되는 경우
+     */
+    if (this.poi && this.crocodile) {
+      this.physics.overlap(this.poi, this.crocodile, () => {
+        this.poi?.setX(10);
+
+        this.setHpContent(false);
+        this.hpText?.setText(`HP: ${this.hpContent}`);
+      });
+    }
   }
 }
 

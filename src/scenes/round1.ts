@@ -1,14 +1,95 @@
 import { Scene } from 'phaser';
 
+import { gameRound1Problems } from '@/constants/game';
+
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
+
+interface Item {
+  currentItem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  isRemoved: boolean;
+  locX: number;
+}
 
 class Round1Scene extends Scene {
   private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
   private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
+  // 떨어지는 아이템
+  private item1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item2: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item3: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item4: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item5: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item6: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+  private item7: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
+
+  private state: Item[];
+
+  // 문제 번호
+  private currentProblemOrder: number;
+
+  // 알파벳을 획득한 경우의 상태
+  private correctAlphabets: string[];
+
   constructor() {
     super('round1-scene');
+
+    this.state = [
+      {
+        currentItem: this.item1,
+        isRemoved: true,
+        locX: 100,
+      },
+      {
+        currentItem: this.item2,
+        isRemoved: true,
+        locX: 200,
+      },
+      {
+        currentItem: this.item3,
+        isRemoved: true,
+        locX: 300,
+      },
+      {
+        currentItem: this.item4,
+        isRemoved: true,
+        locX: 400,
+      },
+      {
+        currentItem: this.item5,
+        isRemoved: true,
+        locX: 500,
+      },
+      {
+        currentItem: this.item6,
+        isRemoved: true,
+        locX: 600,
+      },
+      {
+        currentItem: this.item7,
+        isRemoved: true,
+        locX: 700,
+      },
+    ];
+
+    this.currentProblemOrder = 0;
+    this.correctAlphabets = [];
+  }
+
+  setState(index: number) {
+    this.state[index] = {
+      ...this.state[index],
+      isRemoved: !this.state[index].isRemoved,
+    };
+  }
+
+  setCurrentProblemOrder() {
+    this.currentProblemOrder = this.currentProblemOrder + 1;
+  }
+
+  setCorrectAlphabets(correctAlphabet: string) {
+    this.correctAlphabets.push(correctAlphabet);
   }
 
   preload() {
@@ -89,6 +170,30 @@ class Round1Scene extends Scene {
       frameRate: 10,
       repeat: -1,
     });
+
+    /**
+     * 랜덤 알파벳 생성
+     */
+    this.createRandomAlphabet();
+  }
+
+  createRandomAlphabet() {
+    const randomIdx = () => Math.floor(Math.random() * 25);
+    const randomGravity = () => Math.ceil(Math.random() * 2) * 100;
+
+    this.state.forEach((item, idx) => {
+      if (item.isRemoved) {
+        item.currentItem = this.physics.add.image(
+          item.locX,
+          0,
+          `alphabet-${alphabets[randomIdx()]}`
+        );
+
+        item.currentItem.setGravityY(randomGravity());
+
+        this.setState(idx); // false
+      }
+    });
   }
 
   update(time: number, delta: number): void {
@@ -111,6 +216,38 @@ class Round1Scene extends Scene {
         this.poi.setVelocityY(-400);
       }
     }
+
+    /**
+     * overlap 되는 경우
+     */
+    this.state.forEach((currState, index) => {
+      this.poi &&
+        this.physics.overlap(this.poi, currState.currentItem, () => {
+          currState.currentItem?.destroy();
+
+          const ANSWER = gameRound1Problems[this.currentProblemOrder];
+          const itemContent = currState.currentItem?.texture.key.slice(-1);
+
+          // 아이템이 정답인 경우
+          if (itemContent && ANSWER.indexOf(itemContent) !== -1) {
+            console.log('corrent alphabet!');
+          }
+
+          this.setState(index); // true
+
+          this.createRandomAlphabet();
+        });
+
+      // 아이템과 바닥이 overlap 되는 경우
+      if (currState.currentItem && this.platforms) {
+        this.physics.overlap(currState.currentItem, this.platforms, () => {
+          currState.currentItem?.destroy();
+
+          this.setState(index); //true
+          this.createRandomAlphabet();
+        });
+      }
+    });
   }
 }
 

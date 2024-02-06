@@ -100,7 +100,7 @@ class Round3Scene extends Scene {
   }
 
   preload() {
-    this.load.image('homeBackground', 'assets/backgrounds/bg_step_3.webp');
+    this.load.image('round3Background', 'assets/backgrounds/bg_step_3.webp');
     this.load.image('floor', 'assets/backgrounds/floor.webp');
     this.load.image('hpBackground', 'assets/backgrounds/hp_background.webp');
     this.load.image('hpContent', 'assets/backgrounds/hp_content.webp');
@@ -249,7 +249,7 @@ class Round3Scene extends Scene {
 
         if (this.currentProblemOrder >= gameRound3Problems.length) {
           this.time.delayedCall(500, () => {
-            this.scene.stop('round2-scene');
+            this.scene.stop('round3-scene');
             this.scene.launch('feedback-scene', {
               currentRound: 3,
               isGameOver: false,
@@ -271,7 +271,7 @@ class Round3Scene extends Scene {
       .image(
         gameWidth - gameWidth / 2,
         gameHeight - gameHeight / 2,
-        'homeBackground'
+        'round3Background'
       )
       .setScale(undefined, 1.1);
 
@@ -354,43 +354,74 @@ class Round3Scene extends Scene {
     });
 
     this.bat = this.physics.add
-      .sprite(gameWidth - gameWidth / 2, gameHeight - 320, 'bat', 0)
+      .sprite(gameWidth - gameWidth / 2, gameHeight - 250, 'bat', 0)
       .setScale(0.6);
     this.bat.setOrigin(0.5, 0.5);
+
+    this.bat.setCollideWorldBounds(true);
+    this.bat.body.onWorldBounds = true;
+
+    this.physics.add.collider(this.platforms, this.bat, () => {
+      this.bat?.setY(400);
+      this.bat!.setVelocityX(-100);
+    });
+
+    this.physics.add.overlap(this.poi, this.bat, () => {
+      this.poi?.setY(gameHeight - 100);
+
+      this.setHpContent(false);
+      this.hpText?.setText(`HP: ${this.hpContent}`);
+
+      this.poi?.setTint(0xff9a9e);
+
+      this.time.delayedCall(300, () => {
+        this.poi?.clearTint();
+      });
+    });
+
+    this.bat!.setVelocityX(100);
+
+    // crocodile 스프라이트가 왼쪽 벽에 부딪혔을 때 발생하는 이벤트 핸들러
+    this.physics.world.on(
+      'worldbounds',
+      (
+        body: Phaser.Physics.Arcade.Body,
+        _up: boolean,
+        _down: boolean,
+        left: boolean,
+        right: boolean
+      ) => {
+        if (body.gameObject === this.bat && left) {
+          // 왼쪽 벽에 부딪혔을 때 방향을 변경
+          this.bat!.flipX = true;
+
+          this.bat?.setX(100);
+          this.bat!.setVelocityX(100);
+        } else if (body.gameObject === this.bat && right) {
+          this.bat!.flipX = false;
+
+          this.bat?.setX(700);
+          this.bat!.setVelocityX(-100);
+        }
+      }
+    );
 
     this.cursors = this.input.keyboard?.createCursorKeys();
 
     /**
+     * 포이 애니메이션
+     */
+    this.anims.exists('left');
+    this.anims.exists('turn');
+    this.anims.exists('right');
+
+    /**
      * 박쥐 애니메이션
      */
-
     this.anims.create({
       key: 'fly',
       frames: this.anims.generateFrameNumbers('bat', { start: 0, end: 1 }),
       frameRate: 4,
-      repeat: -1,
-    });
-
-    /**
-     * 포이 애니메이션
-     */
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('poi', { start: 0, end: 1 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'poi', frame: 2 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('poi', { start: 3, end: 4 }),
-      frameRate: 10,
       repeat: -1,
     });
 
@@ -469,6 +500,7 @@ class Round3Scene extends Scene {
                 this.updateAnswerAlphabet(targetItem.alphabet);
               }
             });
+            return;
           } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);

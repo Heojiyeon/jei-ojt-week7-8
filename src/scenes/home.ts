@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 
 class HomeScene extends Scene {
+  private startButtonHandler: (() => void) | undefined;
+
   constructor() {
     super('home-scene');
   }
@@ -39,7 +41,7 @@ class HomeScene extends Scene {
 
     startButton.setInteractive();
 
-    const handleClickStartButton = () => {
+    this.startButtonHandler = () => {
       startButton.destroy();
 
       this.add
@@ -53,11 +55,16 @@ class HomeScene extends Scene {
       this.cameras.main.fadeOut(1000, 202, 255, 251);
 
       this.time.delayedCall(500, () => {
+        this.scene.stop('home-scene');
         this.scene.launch('notice-scene');
       });
     };
 
-    this.input.on('gameobjectdown', handleClickStartButton);
+    this.input.on('gameobjectdown', this.startButtonHandler);
+  }
+
+  shutdown() {
+    this.input.off('gameobjectdown', this.startButtonHandler);
   }
 }
 

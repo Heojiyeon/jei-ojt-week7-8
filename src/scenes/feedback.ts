@@ -77,13 +77,18 @@ class FeedbackScene extends Scene {
 
     if (this.isGameOver === undefined && this.currentRound !== 3) {
       this.time.delayedCall(2000, () => {
+        this.scene.start(`round${this.currentRound! + 1}-scene`);
         this.scene.stop('feedback-scene');
-        this.scene.launch(`round${this.currentRound! + 1}-scene`);
+      });
+    } else if (this.isGameOver === false && this.currentRound === 3) {
+      this.time.delayedCall(2000, () => {
+        this.scene.start(`home-scene`);
+        this.scene.stop('feedback-scene');
       });
     } else {
       this.time.delayedCall(2000, () => {
-        this.scene.remove('feedback-scene');
         this.scene.start(`home-scene`);
+        this.scene.stop('feedback-scene');
       });
     }
   }

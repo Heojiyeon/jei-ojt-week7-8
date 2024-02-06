@@ -169,9 +169,9 @@ class Round3Scene extends Scene {
 
   setHpContent(isIncrease: boolean) {
     if (isIncrease) {
-      this.hpContent < 100 ? (this.hpContent += 10) : 100;
+      this.hpContent <= 100 ? (this.hpContent += 10) : 100;
     } else {
-      this.hpContent > 10 ? (this.hpContent -= 20) : 0;
+      this.hpContent >= 20 ? (this.hpContent -= 20) : 0;
     }
   }
 
@@ -250,7 +250,13 @@ class Round3Scene extends Scene {
         this.setCurrentProblemOrder();
 
         if (this.currentProblemOrder >= gameRound3Problems.length) {
-          alert('game success');
+          this.time.delayedCall(500, () => {
+            this.scene.stop('round2-scene');
+            this.scene.launch('feedback-scene', {
+              currentRound: 3,
+              isGameOver: false,
+            });
+          });
           return;
         } else {
           this.setAnswer();
@@ -346,13 +352,14 @@ class Round3Scene extends Scene {
       frameRate: 10,
       repeat: -1,
     });
-    this.createRandomAlphabet();
-    this.createAnswerAlphabet();
 
     this.hpText = this.add.text(16, 16, 'HP: 100', {
       fontSize: '32px',
       color: '#000',
     });
+
+    this.createRandomAlphabet();
+    this.createAnswerAlphabet();
   }
 
   update(): void {
@@ -395,10 +402,11 @@ class Round3Scene extends Scene {
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
 
-            // 게임 종료
-            if (this.hpContent <= 0) {
-              alert('game over!');
-            }
+            this.poi?.setTint(0xff0000);
+
+            this.time.delayedCall(500, () => {
+              this.poi?.clearTint();
+            });
           }
 
           // 바나나인 경우
@@ -413,6 +421,8 @@ class Round3Scene extends Scene {
               item => item.alphabet === itemContent
             );
 
+            if (!targetItems) return;
+
             targetItems.map(targetItem => {
               if (targetItem.isCollected === false) {
                 this.updateAnswerAlphabet(targetItem.alphabet);
@@ -421,10 +431,29 @@ class Round3Scene extends Scene {
           } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
+
+            this.poi?.setTint(0xff9a9e);
+
+            this.time.delayedCall(300, () => {
+              this.poi?.clearTint();
+            });
           }
 
           this.setState(index); // true
           this.createRandomAlphabet();
+
+          // 게임 종료
+          if (this.hpContent <= 0) {
+            this.time.delayedCall(300, () => {
+              this.scene.stop('round3-scene');
+              this.scene.launch('feedback-scene', {
+                currentRound: 3,
+                isGameOver: true,
+              });
+            });
+
+            return;
+          }
         });
 
       // 아이템과 바닥이 overlap 되는 경우

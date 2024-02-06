@@ -31,6 +31,7 @@ class NoticeScene extends Scene {
     );
 
     this.time.delayedCall(3000, () => {
+      this.scene.stop('notice-scene');
       this.scene.launch('round1-scene');
     });
   }

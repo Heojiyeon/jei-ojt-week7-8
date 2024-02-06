@@ -10,7 +10,7 @@ class Round2Scene extends Scene {
   private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
   private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
   private crocodile:
-    | Phaser.Types.Physics.Arcade.ImageWithDynamicBody
+    | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
     | undefined;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
@@ -159,9 +159,9 @@ class Round2Scene extends Scene {
 
   setHpContent(isIncrease: boolean) {
     if (isIncrease) {
-      this.hpContent < 100 ? (this.hpContent += 10) : 100;
+      this.hpContent <= 100 ? (this.hpContent += 10) : 100;
     } else {
-      this.hpContent > 10 ? (this.hpContent -= 20) : 0;
+      this.hpContent >= 20 ? (this.hpContent -= 20) : 0;
     }
   }
 
@@ -241,8 +241,12 @@ class Round2Scene extends Scene {
 
         if (this.currentProblemOrder >= gameRound2Problems.length) {
           this.time.delayedCall(500, () => {
-            this.scene.launch('round2-scene');
+            this.scene.stop('round2-scene');
+            this.scene.launch('feedback-scene', {
+              currentRound: 2,
+            });
           });
+          return;
         } else {
           this.setAnswer();
           this.createAnswerAlphabet();
@@ -291,8 +295,10 @@ class Round2Scene extends Scene {
     );
 
     this.crocodile.body.setGravityY(300);
-    this.poi.setCollideWorldBounds(true);
+
     this.crocodile.setCollideWorldBounds(true);
+    this.crocodile.body.onWorldBounds = true;
+
     this.physics.add.collider(this.platforms, this.crocodile);
 
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -317,13 +323,23 @@ class Round2Scene extends Scene {
       repeat: -1,
     });
 
-    this.createRandomAlphabet();
-    this.createAnswerAlphabet();
+    this.anims.create({
+      key: 'left-crocodile',
+      frames: [{ key: 'crocodile', frame: 0 }],
+    });
+
+    this.anims.create({
+      key: 'right-crocodile',
+      frames: [{ key: 'crocodile', frame: 1 }],
+    });
 
     this.hpText = this.add.text(16, 16, 'HP: 100', {
       fontSize: '32px',
       color: '#000',
     });
+
+    this.createRandomAlphabet();
+    this.createAnswerAlphabet();
   }
 
   update(): void {
@@ -343,10 +359,9 @@ class Round2Scene extends Scene {
       }
 
       if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-200);
+        this.poi.setVelocityY(-300);
       }
     }
-
     /**
      * overlap 되는 경우
      */
@@ -363,10 +378,11 @@ class Round2Scene extends Scene {
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
 
-            // 게임 종료
-            if (this.hpContent <= 0) {
-              alert('game over!');
-            }
+            this.poi?.setTint(0xff0000);
+
+            this.time.delayedCall(500, () => {
+              this.poi?.clearTint();
+            });
           }
 
           // 바나나인 경우
@@ -381,6 +397,8 @@ class Round2Scene extends Scene {
               item => item.alphabet === itemContent
             );
 
+            if (!targetItems) return;
+
             targetItems.map(targetItem => {
               if (targetItem.isCollected === false) {
                 this.updateAnswerAlphabet(targetItem.alphabet);
@@ -389,10 +407,31 @@ class Round2Scene extends Scene {
           } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
+
+            this.poi?.setTint(0xff9a9e);
+
+            this.time.delayedCall(300, () => {
+              this.poi?.clearTint();
+            });
           }
 
           this.setState(index); // true
           this.createRandomAlphabet();
+
+          // 게임 종료
+          if (this.hpContent <= 0) {
+            this.time.delayedCall(300, () => {
+              this.time.delayedCall(300, () => {
+                this.scene.stop('round2-scene');
+                this.scene.launch('feedback-scene', {
+                  currentRound: 2,
+                  isGameOver: true,
+                });
+              });
+
+              return;
+            });
+          }
         });
 
       // 아이템과 바닥이 overlap 되는 경우

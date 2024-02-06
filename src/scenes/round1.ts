@@ -199,25 +199,35 @@ class Round1Scene extends Scene {
 
     this.cursors = this.input.keyboard?.createCursorKeys();
 
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('poi', { start: 0, end: 1 }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    this.anims.exists('left');
+    this.anims.exists('turn');
+    this.anims.exists('right');
 
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'poi', frame: 2 }],
-      frameRate: 20,
-    });
+    if (
+      !this.anims.exists('left') ||
+      !this.anims.exists('turn') ||
+      !this.anims.exists('right')
+    ) {
+      this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('poi', { start: 0, end: 1 }),
+        frameRate: 10,
+        repeat: -1,
+      });
 
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('poi', { start: 3, end: 4 }),
-      frameRate: 10,
-      repeat: -1,
-    });
+      this.anims.create({
+        key: 'turn',
+        frames: [{ key: 'poi', frame: 2 }],
+        frameRate: 20,
+      });
+
+      this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('poi', { start: 3, end: 4 }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
 
     this.hpText = this.add.text(16, 16, 'HP: 100', {
       fontSize: '32px',

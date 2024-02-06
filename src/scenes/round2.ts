@@ -342,25 +342,9 @@ class Round2Scene extends Scene {
 
     this.cursors = this.input.keyboard?.createCursorKeys();
 
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('poi', { start: 0, end: 1 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'poi', frame: 2 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('poi', { start: 3, end: 4 }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    this.anims.exists('left');
+    this.anims.exists('turn');
+    this.anims.exists('right');
 
     this.anims.create({
       key: 'left-crocodile',
@@ -461,12 +445,10 @@ class Round2Scene extends Scene {
           // 게임 종료
           if (this.hpContent <= 0) {
             this.time.delayedCall(300, () => {
-              this.time.delayedCall(300, () => {
-                this.scene.stop('round2-scene');
-                this.scene.launch('feedback-scene', {
-                  currentRound: 2,
-                  isGameOver: true,
-                });
+              this.scene.stop('round2-scene');
+              this.scene.launch('feedback-scene', {
+                currentRound: 2,
+                isGameOver: true,
               });
 
               return;

@@ -300,6 +300,45 @@ class Round2Scene extends Scene {
     this.crocodile.body.onWorldBounds = true;
 
     this.physics.add.collider(this.platforms, this.crocodile);
+    this.crocodile!.setVelocityX(-100);
+
+    // crocodile 스프라이트가 왼쪽 벽에 부딪혔을 때 발생하는 이벤트 핸들러
+    this.physics.world.on(
+      'worldbounds',
+      (
+        body: Phaser.Physics.Arcade.Body,
+        _up: boolean,
+        _down: boolean,
+        left: boolean,
+        right: boolean
+      ) => {
+        if (body.gameObject === this.crocodile && left) {
+          // 왼쪽 벽에 부딪혔을 때 방향을 변경
+          this.crocodile!.flipX = true;
+
+          this.crocodile?.setX(100);
+          this.crocodile!.setVelocityX(100);
+        } else if (body.gameObject === this.crocodile && right) {
+          this.crocodile!.flipX = false;
+
+          this.crocodile?.setX(700);
+          this.crocodile!.setVelocityX(-100);
+        }
+      }
+    );
+
+    this.physics.add.overlap(this.poi, this.crocodile, () => {
+      this.poi?.setX(this.poi.x - 100);
+
+      this.setHpContent(false);
+      this.hpText?.setText(`HP: ${this.hpContent}`);
+
+      this.poi?.setTint(0xff9a9e);
+
+      this.time.delayedCall(300, () => {
+        this.poi?.clearTint();
+      });
+    });
 
     this.cursors = this.input.keyboard?.createCursorKeys();
 
@@ -362,6 +401,7 @@ class Round2Scene extends Scene {
         this.poi.setVelocityY(-300);
       }
     }
+
     /**
      * overlap 되는 경우
      */
@@ -444,18 +484,6 @@ class Round2Scene extends Scene {
         });
       }
     });
-
-    /**
-     * 악어와 overlap 되는 경우
-     */
-    if (this.poi && this.crocodile) {
-      this.physics.overlap(this.poi, this.crocodile, () => {
-        this.poi?.setX(10);
-
-        this.setHpContent(false);
-        this.hpText?.setText(`HP: ${this.hpContent}`);
-      });
-    }
   }
 }
 

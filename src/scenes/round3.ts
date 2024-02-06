@@ -105,8 +105,6 @@ class Round3Scene extends Scene {
     this.load.image('hpBackground', 'assets/backgrounds/hp_background.webp');
     this.load.image('hpContent', 'assets/backgrounds/hp_content.webp');
     this.load.image('displayBoard', 'assets/boards/board_display.webp');
-    this.load.image('crocodileLeft', 'assets/characters/croc_left.webp');
-    this.load.image('crocodileRight', 'assets/characters/croc_right.webp');
 
     alphabets.split('').map(alphabet => {
       this.load.image(
@@ -310,7 +308,50 @@ class Round3Scene extends Scene {
     );
 
     this.crocodile.body.setGravityY(300);
+
+    this.crocodile.setCollideWorldBounds(true);
+    this.crocodile.body.onWorldBounds = true;
+
     this.physics.add.collider(this.platforms, this.crocodile);
+    this.crocodile!.setVelocityX(-100);
+
+    // crocodile 스프라이트가 왼쪽 벽에 부딪혔을 때 발생하는 이벤트 핸들러
+    this.physics.world.on(
+      'worldbounds',
+      (
+        body: Phaser.Physics.Arcade.Body,
+        _up: boolean,
+        _down: boolean,
+        left: boolean,
+        right: boolean
+      ) => {
+        if (body.gameObject === this.crocodile && left) {
+          // 왼쪽 벽에 부딪혔을 때 방향을 변경
+          this.crocodile!.flipX = true;
+
+          this.crocodile?.setX(100);
+          this.crocodile!.setVelocityX(100);
+        } else if (body.gameObject === this.crocodile && right) {
+          this.crocodile!.flipX = false;
+
+          this.crocodile?.setX(700);
+          this.crocodile!.setVelocityX(-100);
+        }
+      }
+    );
+
+    this.physics.add.overlap(this.poi, this.crocodile, () => {
+      this.poi?.setX(this.poi.x - 100);
+
+      this.setHpContent(false);
+      this.hpText?.setText(`HP: ${this.hpContent}`);
+
+      this.poi?.setTint(0xff9a9e);
+
+      this.time.delayedCall(300, () => {
+        this.poi?.clearTint();
+      });
+    });
 
     this.bat = this.physics.add
       .sprite(gameWidth - gameWidth / 2, gameHeight - 320, 'bat', 0)
@@ -379,7 +420,7 @@ class Round3Scene extends Scene {
       }
 
       if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-200);
+        this.poi.setVelocityY(-300);
       }
 
       if (this.bat) {

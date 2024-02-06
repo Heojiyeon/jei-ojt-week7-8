@@ -50,44 +50,6 @@ class Round1Scene extends Scene {
   constructor() {
     super('round1-scene');
 
-    this.state = [
-      {
-        currentItem: this.item1,
-        isRemoved: true,
-        locX: 100,
-      },
-      {
-        currentItem: this.item2,
-        isRemoved: true,
-        locX: 200,
-      },
-      {
-        currentItem: this.item3,
-        isRemoved: true,
-        locX: 300,
-      },
-      {
-        currentItem: this.item4,
-        isRemoved: true,
-        locX: 400,
-      },
-      {
-        currentItem: this.item5,
-        isRemoved: true,
-        locX: 500,
-      },
-      {
-        currentItem: this.item6,
-        isRemoved: true,
-        locX: 600,
-      },
-      {
-        currentItem: this.item7,
-        isRemoved: true,
-        locX: 700,
-      },
-    ];
-
     this.currentProblemOrder = 0;
     this.correctAlphabets = [];
 
@@ -101,7 +63,7 @@ class Round1Scene extends Scene {
           locX: 640 + idx * 30,
         };
       });
-
+    this.state = [];
     this.hpContent = 100;
   }
 
@@ -163,6 +125,46 @@ class Round1Scene extends Scene {
 
     this.load.image('seed', 'assets/items/item_seed.webp');
     this.load.image('banana', 'assets/items/item_banana.webp');
+
+    this.state = [
+      {
+        currentItem: this.item1,
+        isRemoved: true,
+        locX: 100,
+      },
+      {
+        currentItem: this.item2,
+        isRemoved: true,
+        locX: 200,
+      },
+      {
+        currentItem: this.item3,
+        isRemoved: true,
+        locX: 300,
+      },
+      {
+        currentItem: this.item4,
+        isRemoved: true,
+        locX: 400,
+      },
+      {
+        currentItem: this.item5,
+        isRemoved: true,
+        locX: 500,
+      },
+      {
+        currentItem: this.item6,
+        isRemoved: true,
+        locX: 600,
+      },
+      {
+        currentItem: this.item7,
+        isRemoved: true,
+        locX: 700,
+      },
+    ];
+
+    this.hpContent = 100;
   }
 
   create() {

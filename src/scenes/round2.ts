@@ -43,6 +43,52 @@ class Round2Scene extends Scene {
   constructor() {
     super('round2-scene');
 
+    this.currentProblemOrder = 0;
+    this.correctAlphabets = [];
+
+    // 정답 상태
+    this.answer = gameRound2Problems[this.currentProblemOrder]
+      .split('')
+      .map((currentAlphabet, idx) => {
+        return {
+          alphabet: currentAlphabet,
+          isCollected: false,
+          locX: 640 + idx * 30,
+        };
+      });
+    this.state = [];
+    this.hpContent = 100;
+  }
+
+  preload() {
+    this.load.image('round2Background', 'assets/backgrounds/bg_step_2.webp');
+    this.load.image('floor', 'assets/backgrounds/floor.webp');
+    this.load.image('displayBoard', 'assets/boards/board_display.webp');
+
+    alphabets.split('').map(alphabet => {
+      this.load.image(
+        `alphabet-${alphabet}`,
+        `assets/alphabets/color_${alphabet}.webp`
+      );
+    });
+
+    this.load.spritesheet('poi', 'assets/characters/poi_spritesheet.webp', {
+      frameWidth: 168,
+      frameHeight: 181,
+    });
+
+    this.load.spritesheet(
+      'crocodile',
+      'assets/characters/croc_spritesheet.webp',
+      {
+        frameWidth: 100,
+        frameHeight: 80,
+      }
+    );
+
+    this.load.image('seed', 'assets/items/item_seed.webp');
+    this.load.image('banana', 'assets/items/item_banana.webp');
+
     this.state = [
       {
         currentItem: this.item1,
@@ -81,51 +127,7 @@ class Round2Scene extends Scene {
       },
     ];
 
-    this.currentProblemOrder = 0;
-    this.correctAlphabets = [];
-
-    // 정답 상태
-    this.answer = gameRound2Problems[this.currentProblemOrder]
-      .split('')
-      .map((currentAlphabet, idx) => {
-        return {
-          alphabet: currentAlphabet,
-          isCollected: false,
-          locX: 640 + idx * 30,
-        };
-      });
-
     this.hpContent = 100;
-  }
-
-  preload() {
-    this.load.image('round2Background', 'assets/backgrounds/bg_step_2.webp');
-    this.load.image('floor', 'assets/backgrounds/floor.webp');
-    this.load.image('displayBoard', 'assets/boards/board_display.webp');
-
-    alphabets.split('').map(alphabet => {
-      this.load.image(
-        `alphabet-${alphabet}`,
-        `assets/alphabets/color_${alphabet}.webp`
-      );
-    });
-
-    this.load.spritesheet('poi', 'assets/characters/poi_spritesheet.webp', {
-      frameWidth: 168,
-      frameHeight: 181,
-    });
-
-    this.load.spritesheet(
-      'crocodile',
-      'assets/characters/croc_spritesheet.webp',
-      {
-        frameWidth: 100,
-        frameHeight: 80,
-      }
-    );
-
-    this.load.image('seed', 'assets/items/item_seed.webp');
-    this.load.image('banana', 'assets/items/item_banana.webp');
   }
 
   setState(index: number) {

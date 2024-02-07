@@ -8,6 +8,7 @@ class HomeScene extends Scene {
   }
 
   preload() {
+    this.load.image('mainTitle', 'assets/texts/mainTitle.webp');
     this.load.image('homeBackground', 'assets/backgrounds/bg_step_1.webp');
     this.load.image(
       'startBeforeButton',
@@ -39,10 +40,18 @@ class HomeScene extends Scene {
       )
       .setScale(undefined, 1.1);
 
+    this.add
+      .image(
+        gameWidth - gameWidth / 2,
+        gameHeight - gameHeight / 2,
+        'mainTitle'
+      )
+      .setScale(0.8, 0.8);
+
     const startButton = this.add
       .image(
         gameWidth - gameWidth / 2,
-        gameHeight - gameHeight / 3,
+        gameHeight - gameHeight / 4,
         'startBeforeButton'
       )
       .setScale(0.4, 0.4);
@@ -55,7 +64,7 @@ class HomeScene extends Scene {
       this.add
         .image(
           gameWidth - gameWidth / 2,
-          gameHeight - gameHeight / 3,
+          gameHeight - gameHeight / 4,
           'startAfterButton'
         )
         .setScale(0.4, 0.4);

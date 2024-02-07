@@ -5,6 +5,8 @@ import { Item } from '@/types/game';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class BaseRoundScene extends Scene {
+  platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
+
   state: Item[] | undefined;
   // 떨어지는 아이템
   item1: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
@@ -16,8 +18,8 @@ class BaseRoundScene extends Scene {
   item7: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
 
   currentProblemOrder: number;
-  // 알파벳을 획득한 경우의 상태
   correctAlphabets: string[];
+
   hpContent: number | undefined;
 
   constructor(key: string) {
@@ -109,6 +111,21 @@ class BaseRoundScene extends Scene {
 
     this.currentProblemOrder = 0;
     this.hpContent = 100;
+  }
+
+  create() {
+    const gameWidth = Number(this.game.config.width);
+    const gameHeight = Number(this.game.config.height);
+
+    /**
+     * floor 생성
+     */
+    this.platforms = this.physics.add.staticGroup();
+
+    this.platforms
+      .create(gameWidth - gameWidth / 2, gameHeight, 'floor')
+      .setScale(2)
+      .refreshBody();
   }
 
   /**

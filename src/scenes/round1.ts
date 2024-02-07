@@ -8,7 +8,6 @@ import BaseRoundScene from './BaseRound';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class Round1Scene extends BaseRoundScene {
-  private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
   private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
@@ -37,6 +36,8 @@ class Round1Scene extends BaseRoundScene {
   }
 
   create() {
+    super.create();
+
     const gameWidth = Number(this.game.config.width);
     const gameHeight = Number(this.game.config.height);
 
@@ -59,13 +60,6 @@ class Round1Scene extends BaseRoundScene {
       .image(gameWidth - gameWidth / 8, gameHeight / 6, 'displayBoard')
       .setScale(undefined, 1.1);
 
-    this.platforms = this.physics.add.staticGroup();
-
-    this.platforms
-      .create(gameWidth - gameWidth / 2, gameHeight, 'floor')
-      .setScale(2)
-      .refreshBody();
-
     this.poi = this.physics.add
       .sprite(gameWidth - gameWidth / 2, gameHeight - 150, 'poi', 2)
       .setScale(0.5);
@@ -73,7 +67,18 @@ class Round1Scene extends BaseRoundScene {
     this.poi.body.setGravityY(300);
     this.poi.setCollideWorldBounds(true);
 
-    this.physics.add.collider(this.poi, this.platforms);
+    /**
+     * floor 생성
+     */
+    const floor = this.platforms!.create(
+      gameWidth - gameWidth / 2,
+      gameHeight,
+      'floor'
+    ).setScale(2);
+    floor.refreshBody();
+
+    this.add.existing(floor);
+    this.physics.add.collider(this.poi, floor);
 
     this.cursors = this.input.keyboard?.createCursorKeys();
 

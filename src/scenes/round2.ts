@@ -8,7 +8,6 @@ import BaseRoundScene from './BaseRound';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class Round2Scene extends BaseRoundScene {
-  private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;
   private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
   private crocodile:
     | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
@@ -58,13 +57,6 @@ class Round2Scene extends BaseRoundScene {
       .image(gameWidth - gameWidth / 8, gameHeight / 6, 'displayBoard')
       .setScale(undefined, 1.1);
 
-    this.platforms = this.physics.add.staticGroup();
-
-    this.platforms
-      .create(gameWidth - gameWidth / 2, gameHeight, 'floor')
-      .setScale(2)
-      .refreshBody();
-
     this.poi = this.physics.add
       .sprite(gameWidth - gameWidth / 2, gameHeight - 150, 'poi', 2)
       .setScale(0.5);
@@ -72,7 +64,20 @@ class Round2Scene extends BaseRoundScene {
     this.poi.body.setGravityY(300);
     this.poi.setCollideWorldBounds(true);
 
-    this.physics.add.collider(this.poi, this.platforms);
+    /**
+     * floor 생성
+     */
+    const floor = this.platforms!.create(
+      gameWidth - gameWidth / 2,
+      gameHeight,
+      'floor'
+    ).setScale(2);
+    floor.refreshBody();
+
+    this.add.existing(floor);
+    this.physics.add.collider(this.poi, floor);
+
+    this.physics.add.collider(this.poi, floor);
 
     this.crocodile = this.physics.add.sprite(
       gameWidth - gameWidth / 8,
@@ -86,7 +91,7 @@ class Round2Scene extends BaseRoundScene {
     this.crocodile.setCollideWorldBounds(true);
     this.crocodile.body.onWorldBounds = true;
 
-    this.physics.add.collider(this.platforms, this.crocodile);
+    this.physics.add.collider(floor, this.crocodile);
     this.crocodile!.setVelocityX(-100);
 
     // crocodile 스프라이트가 왼쪽 벽에 부딪혔을 때 발생하는 이벤트 핸들러

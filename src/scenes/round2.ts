@@ -1,5 +1,6 @@
 import { GameObjects } from 'phaser';
 
+import Poi from '@/components/Poi';
 import { gameRound2Problems } from '@/constants/game';
 import { AnswerAlphabet } from '@/types/game';
 
@@ -8,7 +9,7 @@ import BaseRoundScene from './BaseRound';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class Round2Scene extends BaseRoundScene {
-  private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+  private poi: Phaser.Physics.Arcade.Sprite | undefined;
   private crocodile:
     | Phaser.Types.Physics.Arcade.SpriteWithDynamicBody
     | undefined;
@@ -21,9 +22,6 @@ class Round2Scene extends BaseRoundScene {
 
   constructor() {
     super('round2-scene');
-
-    this.currentProblemOrder = 0;
-    this.correctAlphabets = [];
 
     // 정답 상태
     this.answer = gameRound2Problems[this.currentProblemOrder]
@@ -42,6 +40,8 @@ class Round2Scene extends BaseRoundScene {
   }
 
   create() {
+    super.create();
+
     const gameWidth = Number(this.game.config.width);
     const gameHeight = Number(this.game.config.height);
 
@@ -57,12 +57,7 @@ class Round2Scene extends BaseRoundScene {
       .image(gameWidth - gameWidth / 8, gameHeight / 6, 'displayBoard')
       .setScale(undefined, 1.1);
 
-    this.poi = this.physics.add
-      .sprite(gameWidth - gameWidth / 2, gameHeight - 150, 'poi', 2)
-      .setScale(0.5);
-
-    this.poi.body.setGravityY(300);
-    this.poi.setCollideWorldBounds(true);
+    this.poi = new Poi(this, gameWidth - gameWidth / 2, gameHeight - 150);
 
     /**
      * floor 생성
@@ -77,7 +72,10 @@ class Round2Scene extends BaseRoundScene {
     this.add.existing(floor);
     this.physics.add.collider(this.poi, floor);
 
-    this.physics.add.collider(this.poi, floor);
+    this.hpText = this.add.text(16, 16, 'HP: 100', {
+      fontSize: '32px',
+      color: '#000',
+    });
 
     this.crocodile = this.physics.add.sprite(
       gameWidth - gameWidth / 8,
@@ -135,25 +133,6 @@ class Round2Scene extends BaseRoundScene {
     });
 
     this.cursors = this.input.keyboard?.createCursorKeys();
-
-    this.anims.exists('left');
-    this.anims.exists('turn');
-    this.anims.exists('right');
-
-    this.anims.create({
-      key: 'left-crocodile',
-      frames: [{ key: 'crocodile', frame: 0 }],
-    });
-
-    this.anims.create({
-      key: 'right-crocodile',
-      frames: [{ key: 'crocodile', frame: 1 }],
-    });
-
-    this.hpText = this.add.text(16, 16, 'HP: 100', {
-      fontSize: '32px',
-      color: '#000',
-    });
 
     this.createRandomAlphabet();
     this.createAnswerAlphabet();
@@ -264,24 +243,8 @@ class Round2Scene extends BaseRoundScene {
   }
 
   update(): void {
-    if (this.cursors && this.poi) {
-      if (this.cursors.left.isDown) {
-        this.poi.setVelocityX(-300);
-
-        this.poi.anims.play('left', true);
-      } else if (this.cursors.right.isDown) {
-        this.poi.setVelocityX(300);
-
-        this.poi.anims.play('right', true);
-      } else {
-        this.poi.setVelocityX(0);
-
-        this.poi.anims.play('turn');
-      }
-
-      if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-300);
-      }
+    if (this.poi) {
+      this.poi.update(this.cursors);
     }
 
     /**

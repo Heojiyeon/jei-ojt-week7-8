@@ -1,5 +1,6 @@
 import { GameObjects } from 'phaser';
 
+import Poi from '@/components/Poi';
 import { gameRound1Problems } from '@/constants/game';
 import { AnswerAlphabet } from '@/types/game';
 
@@ -8,7 +9,7 @@ import BaseRoundScene from './BaseRound';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class Round1Scene extends BaseRoundScene {
-  private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+  private poi: Phaser.Physics.Arcade.Sprite | undefined;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
   private answerItems: Phaser.Physics.Arcade.StaticGroup | undefined;
@@ -60,12 +61,7 @@ class Round1Scene extends BaseRoundScene {
       .image(gameWidth - gameWidth / 8, gameHeight / 6, 'displayBoard')
       .setScale(undefined, 1.1);
 
-    this.poi = this.physics.add
-      .sprite(gameWidth - gameWidth / 2, gameHeight - 150, 'poi', 2)
-      .setScale(0.5);
-
-    this.poi.body.setGravityY(300);
-    this.poi.setCollideWorldBounds(true);
+    this.poi = new Poi(this, gameWidth - gameWidth / 2, gameHeight - 150);
 
     /**
      * floor 생성
@@ -81,36 +77,6 @@ class Round1Scene extends BaseRoundScene {
     this.physics.add.collider(this.poi, floor);
 
     this.cursors = this.input.keyboard?.createCursorKeys();
-
-    this.anims.exists('left');
-    this.anims.exists('turn');
-    this.anims.exists('right');
-
-    if (
-      !this.anims.exists('left') ||
-      !this.anims.exists('turn') ||
-      !this.anims.exists('right')
-    ) {
-      this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('poi', { start: 0, end: 1 }),
-        frameRate: 10,
-        repeat: -1,
-      });
-
-      this.anims.create({
-        key: 'turn',
-        frames: [{ key: 'poi', frame: 2 }],
-        frameRate: 20,
-      });
-
-      this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('poi', { start: 3, end: 4 }),
-        frameRate: 10,
-        repeat: -1,
-      });
-    }
 
     this.hpText = this.add.text(16, 16, 'HP: 100', {
       fontSize: '32px',
@@ -237,24 +203,8 @@ class Round1Scene extends BaseRoundScene {
   }
 
   update(): void {
-    if (this.cursors && this.poi) {
-      if (this.cursors.left.isDown) {
-        this.poi.setVelocityX(-300);
-
-        this.poi.anims.play('left', true);
-      } else if (this.cursors.right.isDown) {
-        this.poi.setVelocityX(300);
-
-        this.poi.anims.play('right', true);
-      } else {
-        this.poi.setVelocityX(0);
-
-        this.poi.anims.play('turn');
-      }
-
-      if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-200);
-      }
+    if (this.poi) {
+      this.poi.update(this.cursors);
     }
 
     /**

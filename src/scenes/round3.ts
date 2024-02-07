@@ -1,5 +1,6 @@
 import { GameObjects } from 'phaser';
 
+import Poi from '@/components/Poi';
 import { gameRound3Problems } from '@/constants/game';
 import { AnswerAlphabet } from '@/types/game';
 
@@ -8,12 +9,13 @@ import BaseRoundScene from './BaseRound';
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 
 class Round3Scene extends BaseRoundScene {
-  private poi: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+  private poi: Phaser.Physics.Arcade.Sprite | undefined;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
+
   private crocodile:
     | Phaser.Types.Physics.Arcade.ImageWithDynamicBody
     | undefined;
   private bat: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
-  private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
 
   private answerItems: Phaser.Physics.Arcade.StaticGroup | undefined;
 
@@ -40,6 +42,8 @@ class Round3Scene extends BaseRoundScene {
   }
 
   create() {
+    super.create();
+
     const gameWidth = Number(this.game.config.width);
     const gameHeight = Number(this.game.config.height);
 
@@ -60,12 +64,8 @@ class Round3Scene extends BaseRoundScene {
       .image(gameWidth / 7, gameHeight / 12, 'hpContent')
       .setSize(120, 20);
 
-    this.poi = this.physics.add
-      .sprite(gameWidth - gameWidth / 2, gameHeight - 150, 'poi', 2)
-      .setScale(0.5);
-
-    this.poi.body.setGravityY(300);
-    this.poi.setCollideWorldBounds(true);
+    this.poi = new Poi(this, gameWidth - gameWidth / 2, gameHeight - 150);
+    this.cursors = this.input.keyboard?.createCursorKeys();
 
     /**
      * floor 생성
@@ -79,6 +79,11 @@ class Round3Scene extends BaseRoundScene {
 
     this.add.existing(floor);
     this.physics.add.collider(this.poi, floor);
+
+    this.hpText = this.add.text(16, 16, 'HP: 100', {
+      fontSize: '32px',
+      color: '#000',
+    });
 
     this.crocodile = this.physics.add.sprite(
       gameWidth - gameWidth / 8,
@@ -189,30 +194,6 @@ class Round3Scene extends BaseRoundScene {
         }
       }
     );
-
-    this.cursors = this.input.keyboard?.createCursorKeys();
-
-    /**
-     * 포이 애니메이션
-     */
-    this.anims.exists('left');
-    this.anims.exists('turn');
-    this.anims.exists('right');
-
-    /**
-     * 박쥐 애니메이션
-     */
-    this.anims.create({
-      key: 'fly',
-      frames: this.anims.generateFrameNumbers('bat', { start: 0, end: 1 }),
-      frameRate: 4,
-      repeat: -1,
-    });
-
-    this.hpText = this.add.text(16, 16, 'HP: 100', {
-      fontSize: '32px',
-      color: '#000',
-    });
 
     this.createRandomAlphabet();
     this.createAnswerAlphabet();
@@ -334,28 +315,8 @@ class Round3Scene extends BaseRoundScene {
   }
 
   update(): void {
-    if (this.cursors && this.poi) {
-      if (this.cursors.left.isDown) {
-        this.poi.setVelocityX(-300);
-
-        this.poi.anims.play('left', true);
-      } else if (this.cursors.right.isDown) {
-        this.poi.setVelocityX(300);
-
-        this.poi.anims.play('right', true);
-      } else {
-        this.poi.setVelocityX(0);
-
-        this.poi.anims.play('turn');
-      }
-
-      if (this.cursors.up.isDown && this.poi.body.touching.down) {
-        this.poi.setVelocityY(-300);
-      }
-
-      if (this.bat) {
-        this.bat.anims.play('fly', true);
-      }
+    if (this.poi) {
+      this.poi.update(this.cursors);
     }
     /**
      * overlap 되는 경우

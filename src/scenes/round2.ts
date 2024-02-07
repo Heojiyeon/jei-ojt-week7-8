@@ -1,8 +1,7 @@
 import { GameObjects, Scene } from 'phaser';
 
 import { gameRound2Problems } from '@/constants/game';
-
-import { AnswerAlphabet, Item } from './round1';
+import { AnswerAlphabet, Item } from '@/types/game';
 
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
 

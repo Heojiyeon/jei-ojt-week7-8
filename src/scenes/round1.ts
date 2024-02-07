@@ -1,20 +1,9 @@
 import { GameObjects, Scene } from 'phaser';
 
 import { gameRound1Problems } from '@/constants/game';
+import { AnswerAlphabet, Item } from '@/types/game';
 
 const alphabets = 'abcdefghijklmnopqrstuvwxyz';
-
-export interface Item {
-  currentItem: Phaser.Types.Physics.Arcade.ImageWithDynamicBody | undefined;
-  isRemoved: boolean;
-  locX: number;
-}
-
-export interface AnswerAlphabet {
-  alphabet: string;
-  isCollected: boolean;
-  locX: number;
-}
 
 class Round1Scene extends Scene {
   private platforms: Phaser.Physics.Arcade.StaticGroup | undefined;

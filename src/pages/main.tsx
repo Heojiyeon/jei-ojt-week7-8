@@ -1,7 +1,7 @@
-import Phaser from '@/components/Phaser';
+import Player from '@/components/Player';
 
 const MainPage = () => {
-  return <Phaser />;
+  return <Player />;
 };
 
 export default MainPage;

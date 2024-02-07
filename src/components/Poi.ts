@@ -1,4 +1,4 @@
-export default class Poi extends Phaser.Physics.Arcade.Sprite {
+class Poi extends Phaser.Physics.Arcade.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'poi');
     scene.add.existing(this);
@@ -46,8 +46,10 @@ export default class Poi extends Phaser.Physics.Arcade.Sprite {
       }
 
       if (cursors.up.isDown && this.body?.touching.down) {
-        this.setVelocityY(-200);
+        this.setVelocityY(-300);
       }
     }
   }
 }
+
+export default Poi;

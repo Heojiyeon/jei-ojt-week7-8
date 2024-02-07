@@ -32,6 +32,7 @@ class BaseRoundScene extends Scene {
   preload() {
     this.load.image('homeBackground', 'assets/backgrounds/bg_step_1.webp');
     this.load.image('round2Background', 'assets/backgrounds/bg_step_2.webp');
+    this.load.image('round3Background', 'assets/backgrounds/bg_step_3.webp');
 
     this.load.image('floor', 'assets/backgrounds/floor.webp');
     this.load.image('hpBackground', 'assets/backgrounds/hp_background.webp');

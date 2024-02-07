@@ -1,7 +1,6 @@
 import { AUTO, Game, WEBGL } from 'phaser';
 import { useEffect, useRef } from 'react';
 
-import BaseRoundScene from '@/scenes/BaseRound';
 import FeedbackScene from '@/scenes/feedback';
 import HomeScene from '@/scenes/home';
 import NoticeScene from '@/scenes/notice';
@@ -30,7 +29,14 @@ const Player = () => {
           debug: false,
         },
       },
-      scene: [Round1Scene, Round2Scene, Round3Scene, FeedbackScene],
+      scene: [
+        HomeScene,
+        NoticeScene,
+        Round1Scene,
+        Round2Scene,
+        Round3Scene,
+        FeedbackScene,
+      ],
     };
 
     PhaserGameRef.current = new Game(config);

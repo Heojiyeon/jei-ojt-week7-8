@@ -17,11 +17,19 @@ class HomeScene extends Scene {
       'startAfterButton',
       'assets/buttons/btn_game_start_after.webp'
     );
+    this.load.audio('backgroundAudio', ['assets/audios/background.mp3']);
   }
 
   create() {
     const gameWidth = Number(this.game.config.width);
     const gameHeight = Number(this.game.config.height);
+
+    this.sound
+      .add('backgroundAudio', {
+        volume: 0.6,
+        loop: true,
+      })
+      .play();
 
     this.add
       .image(

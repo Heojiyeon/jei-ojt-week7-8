@@ -97,6 +97,10 @@ class Round3Scene extends Scene {
     this.load.image('seed', 'assets/items/item_seed.webp');
     this.load.image('banana', 'assets/items/item_banana.webp');
 
+    this.load.audio('backgroundAudio', 'assets/audios/background.mp3');
+    this.load.audio('successAudio', 'assets/audios/success.mp3');
+    this.load.audio('failureAudio', 'assets/audios/failure.mp3');
+
     this.state = [
       {
         currentItem: this.item1,
@@ -343,6 +347,8 @@ class Round3Scene extends Scene {
     );
 
     this.physics.add.overlap(this.poi, this.crocodile, () => {
+      this.sound.add('failureAudio').play();
+
       this.poi?.setX(this.poi.x - 100);
 
       this.setHpContent(false);
@@ -369,6 +375,8 @@ class Round3Scene extends Scene {
     });
 
     this.physics.add.overlap(this.poi, this.bat, () => {
+      this.sound.add('failureAudio').play();
+
       this.poi?.setY(gameHeight - 100);
 
       this.setHpContent(false);
@@ -473,6 +481,8 @@ class Round3Scene extends Scene {
 
           // 씨앗인 경우
           if (currState.currentItem?.texture.key === 'seed') {
+            this.sound.add('failureAudio').play();
+
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
 
@@ -485,12 +495,16 @@ class Round3Scene extends Scene {
 
           // 바나나인 경우
           else if (currState.currentItem?.texture.key === 'banana') {
+            this.sound.add('successAudio').play();
+
             this.setHpContent(true);
             this.hpText?.setText(`HP: ${this.hpContent}`);
           }
 
           // 아이템이 정답인 경우
           else if (itemContent && ANSWER.indexOf(itemContent) !== -1) {
+            this.sound.add('successAudio').play();
+
             const targetItems = this.answer.filter(
               item => item.alphabet === itemContent
             );
@@ -504,6 +518,8 @@ class Round3Scene extends Scene {
             });
             return;
           } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
+            this.sound.add('failureAudio').play();
+
             this.setHpContent(false);
             this.hpText?.setText(`HP: ${this.hpContent}`);
 

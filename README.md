@@ -1,30 +1,15 @@
-# React + TypeScript + Vite
+## 재능교육 OJT 7-8주차 - 영단어 게임 🔠🦊
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+### 목표
+- Phaser를 활용한 게임 개발
+### 핵심 기능
+- 알파벳, 이외 아이템 랜덤 생성 기능
+- 게임 라운드 별 장애물 추가 기능
+- 획득 아이템에 따른 HP 조절 기능
+- HP 양에 따른 game over, game success 피드백 제공
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 핵심 화면
+![image](https://github.com/Heojiyeon/jei-ojt-week7-8/assets/33304871/3abc4e88-0aa7-4de1-88f3-fc08183a2dc1)
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Copyright © JEI corporation. All rights reserved. 

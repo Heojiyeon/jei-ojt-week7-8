@@ -42,13 +42,6 @@ class Round1Scene extends BaseRoundScene {
     const gameWidth = Number(this.game.config.width);
     const gameHeight = Number(this.game.config.height);
 
-    this.sound
-      .add('backgroundAudio', {
-        volume: 0.6,
-        loop: true,
-      })
-      .play();
-
     this.add
       .image(
         gameWidth - gameWidth / 2,

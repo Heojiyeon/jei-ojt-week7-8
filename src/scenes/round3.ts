@@ -213,33 +213,34 @@ class Round3Scene extends BaseRoundScene {
       });
   }
 
-  setHpContent(isIncrease: boolean) {
-    if (this.hpContent) {
-      if (isIncrease) {
-        this.hpContent <= 100 ? (this.hpContent += 10) : 100;
-      } else {
-        this.hpContent >= 20 ? (this.hpContent -= 20) : 0;
-      }
-    }
-  }
-
   /**
    * 랜덤 알파벳 생성 함수
    */
   createRandomAlphabet() {
-    const randomIdx = () => Math.floor(Math.random() * 26);
+    const randomIdx = (lastIndex: number) =>
+      Math.floor(Math.random() * lastIndex);
     const randomGravity = () => Math.ceil(Math.random() * 2) * 100;
+
+    const answers = this.answer.map(item => item.alphabet).join('');
+    const restAlphabets = alphabets
+      .split('')
+      .filter(item => answers.indexOf(item) === -1);
+
+    const selects = [1, 2, 4, 5];
+    const randomItemLocation = selects[randomIdx(selects.length)];
 
     this.state?.forEach((item, idx) => {
       if (item.isRemoved) {
         item.currentItem = this.physics.add.image(
           item.locX,
           0,
-          randomIdx() < 25
-            ? `alphabet-${alphabets[randomIdx()]}`
-            : randomIdx() === 25
-              ? 'seed'
-              : 'banana'
+          idx === 0 || idx === 3 || idx === 6
+            ? `alphabet-${restAlphabets[randomIdx(restAlphabets.length)]}`
+            : randomItemLocation === idx
+              ? this.hpContent! < 50
+                ? 'banana'
+                : 'seed'
+              : `alphabet-${answers[randomIdx(answers.length)]}`
         );
 
         item.currentItem.setGravityY(randomGravity());
@@ -366,7 +367,6 @@ class Round3Scene extends BaseRoundScene {
                 this.updateAnswerAlphabet(targetItem.alphabet);
               }
             });
-            return;
           } else if (itemContent && ANSWER.indexOf(itemContent) === -1) {
             this.sound.add('failureAudio').play();
 

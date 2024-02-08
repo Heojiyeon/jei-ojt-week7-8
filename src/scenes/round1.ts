@@ -110,19 +110,35 @@ class Round1Scene extends BaseRoundScene {
     const selects = [1, 2, 4, 5];
     const randomItemLocation = selects[randomIdx(selects.length)];
 
+    /**
+     * 아이템 생성 함수
+     */
+    const getItem = (currentIdx: number) => {
+      const isSpecialIndex = (currentIdx: number) =>
+        currentIdx === 0 || currentIdx === 3 || currentIdx === 6;
+
+      const isRandomItemLocation = (currentIdx: number) =>
+        randomItemLocation === currentIdx;
+
+      const shouldUseHpContent =
+        isRandomItemLocation(currentIdx) && this.hpContent! < 50;
+
+      let result;
+
+      if (isSpecialIndex(currentIdx)) {
+        result = `alphabet-${restAlphabets[randomIdx(restAlphabets.length)]}`;
+      } else if (isRandomItemLocation(currentIdx)) {
+        result = shouldUseHpContent ? 'banana' : 'seed';
+      } else {
+        result = `alphabet-${answers[randomIdx(answers.length)]}`;
+      }
+
+      return result;
+    };
+
     this.state?.forEach((item, idx) => {
       if (item.isRemoved) {
-        item.currentItem = this.physics.add.image(
-          item.locX,
-          0,
-          idx === 0 || idx === 3 || idx === 6
-            ? `alphabet-${restAlphabets[randomIdx(restAlphabets.length)]}`
-            : randomItemLocation === idx
-              ? this.hpContent! < 50
-                ? 'banana'
-                : 'seed'
-              : `alphabet-${answers[randomIdx(answers.length)]}`
-        );
+        item.currentItem = this.physics.add.image(item.locX, 0, getItem(idx));
 
         item.currentItem.setGravityY(randomGravity());
 
